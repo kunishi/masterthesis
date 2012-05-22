@@ -1,0 +1,233 @@
+\section{Extensions of the Management Model for Cooperative Design}
+\label{sec:extension}
+In this section, we will discuss several extensions of our data management
+model described in Section \ref{sec:dmm}.
+
+\subsection{Extensions of Dependencies among Test Tools}
+\label{subsec:ext-testtooldep}
+We proposed \testtool dependencies, dependencies among test tools,
+in Section \ref{subsubsec:testtooldep}. 
+The meaning of a \testtool dependency $t_i \testtooldep t_j$ is that 
+all the design data which passed tests using a tool $t_i$ are expected to
+pass tests of another tool $t_j$, by Definition
+\ref{def:testtool-depend}.
+
+There are many ways of extensions for this dependency.
+First, we can consider more dependencies among test tools on CAD
+systems.
+\begin{itemize}
+\item If a design data passed a test of tool $t_i$, it can be
+tested by another test tool $t_j$.
+\item If a design data passed a test of tool $t_i$, it cannot be 
+tested by another test tool $t_j$.
+\end{itemize}
+Second, we can extend the dependencies, which is binary, to the non-binary
+ones between two sets of test tools.
+
+Then we extend the \testtool dependency as follows:
+\begin{definition}
+\label{def:ext-testtooldep}
+Define an {\em extended testTool dependency} as
+\[ t_{i_1}t_{i_2}\cdots t_{i_n} \longrightarrow_{tool(kind)} 
+t_{j_1}t_{j_2}\cdots t_{j_m} \]
+where $t_{i_1}, t_{i_2}, \cdots, t_{i_n}, t_{j_1}, t_{j_2}, \cdots,
+t_{j_m}$ are test tools, and $kind$ is one of the following commands.
+\begin{itemize}
+\item $omit$\\
+tests of $t_{j_1}, t_{j_2}, \cdots, t_{j_m}$ can be omitted if tests of
+$t_{i_1}, t_{i_2}, \cdots, t_{i_n}$ are all passed.
+\item $permit$\\
+tests of $t_{j_1}, t_{j_2}, \cdots, t_{j_m}$ are permitted if tests of
+$t_{i_1}, t_{i_2}, \cdots, t_{i_n}$ are all passed.
+\item $prohibit$\\
+tests of $t_{j_1}, t_{j_2}, \cdots, t_{j_m}$ are prohibited if tests
+of $t_{i_1}, t_{i_2}, \cdots, t_{i_n}$ are all passed.
+\end{itemize}\hfill$\Box$
+\end{definition}
+
+These dependencies are written by the access control function $F$ in Section 
+\ref{subsubsec:testtooldep} as:
+\begin{itemize}
+\item the case of $kind = omit$\\
+It is as same as in Section \ref{subsubsec:testtooldep}.
+\item the case of $kind = permit$\\
+For each $t$ in $\{t_{j_1}, t_{j_2}, \cdots, t_{j_m}\}$, 
+\[ F(u, t, db, f_1, f_2, \cdots, f_n) = 1 \iff f_{i_1} \wedge f_{i_2} 
+\wedge \cdots \wedge f_{i_n} = 1. \]
+\item the case of $kind = prohibit$\\
+For each $t$ in $\{t_{j_1}, t_{j_2}, \cdots, t_{j_m}\}$, 
+\[ F(u, t, db, f_1, f_2, \cdots, f_n) = 0 \iff f_{i_1} \wedge f_{i_2} 
+\wedge \cdots \wedge f_{i_n} = 1. \]
+\end{itemize}
+
+\subsection{Design Process Automaton} \label{subsec:dpa}
+Data management by the access control function $F$ in Section 
+\ref{subsubsec:testtooldep} is based on results of the latest test of 
+each test tools.
+Then it cannot support such a case that design data can be shared if it
+passes tests of a tool more than $n$ times.
+This situation often occurs in a design process of CAD systems since
+designers repeats tests of a test tool with various input data.
+In order to manage such cases, we define a design process automaton for 
+each design data.
+\begin{definition} \label{def:dpa}
+Define a {\em design process automaton} ({\em DPA}) for each design data
+as \[ DPA = (I, S, S_0, \delta) \]
+where $I$, $S$ and $S_0$ are finite, nonempty sets of inputs, states,
+and initial states, respectively; 
+$\delta: I \times S \rightarrow S$ is the state transition function.
+\hfill$\Box$\end{definition}
+
+Figure \ref{fig:dpa} shows an example of {\em DPA} of a design data.
+This {\em DPA} manages a design process that the design data must pass
+tests using $t_1$ more than three times to be shared, but it 
+may pass a test using $t_2$ only once.
+\begin{figure}
+%\begin{center}
+\input{dpa}
+\caption{An Example of a Design Process Automaton}
+\label{fig:dpa}
+%\end{center}
+\end{figure}
+
+We can construct $F$ by {\em DFA} with the following $S$, $I$, $S_0$ 
+and $\delta$:
+\begin{itemize}
+\item $S$ is a set of \tfs $(f_1, f_2, \cdots, f_n)$.
+\item $I$ is a set \[ \{Pass(t), Fail(t) | t \in T, T \mbox{ is a set of
+all test tools } \} .\] 
+If $F(u, t, db, f_1, f_2, \cdots, f_n) = 1$, then {\em DPA} makes a 
+transition by $Pass(t)$.
+If $F(u, t, db, f_1, f_2, \cdots, f_n) = 0$, then it makes a transition
+by $Fail(t)$.
+\item $S_0$ is a set of \tfs,  $\{(0, 0, \cdots, 0)\}$.
+\item $\delta$ is defined as
+\[ \delta((f_1, f_2, \cdots, f_i, \cdots, f_n), Pass(t_i)) = (f_1, f_2, 
+\cdots, 1, \cdots, f_n)\]
+\[\delta((f_1, f_2, \cdots, f_i, \cdots, f_n), Fail(t_i)) = (f_1, f_2, 
+\cdots, 0, \cdots, f_n)\]
+\end{itemize}
+
+\subsection{User Hierarchy}
+\label{subsec:userhierarchy}
+In both the conventional management model and our model in Section 
+\ref{sec:dmm}, the members of a
+group are modeled to have the same authority over design data.
+In actual cooperative design, however, they may have different
+authorities on each other.
+For example, each group usually has a leader 
+as a manager of the project of the group.
+The leader usually has more authority over design data than normal
+designers in order to do smooth managements.
+He may be able to read some design data which is not 
+accessible for normal designers, such as the ones in a private database
+of one of the members.
+
+Then we consider the way to manage such situations in this section.
+First we define orderings between the members of a group.
+\begin{definition} \label{def:user-part-order}
+For each users $u_i$ and $u_j$ in the group, 
+\[ u_i \succeq u_j \iff F(u_i, t, db, f_1, 
+\cdots, f_n) \geq F(u_j, t, db, f_1, \cdots, f_n) \]
+for all transactions $t$, 
+where $F$ is the access control function of a design data $D$. 
+
+In particular, 
+\[ u_i = u_j \iff F(u_i, t, db, f_1, \cdots, f_n) =
+F(u_j, t, db, f_1, \cdots, f_n) \]
+for all $t$. \hfill$\Box$
+\end{definition}
+This ordering is partial, since a set of executable transactions of each
+designer may be different from each other.
+Then a set of all members of the group forms a hierarchy.
+We call it as a {\em user hierarchy}.
+
+We find a simple example of user hierarchy in an example in 
+Section \ref{subsec:example}.
+Since $F''(u, read(D), DB, evalTest, 1) = 1$ iff $u$ is a member of
+group($DB$), $u_j \succeq u_k$, where $u_j$ is a member of $group(DB)$
+while $u_k$ is a designer without group($DB$).
+On the other hand, since $F''(u, update(D), DB, evalTest, 1) = 1$ iff
+$u$ is a member of group($child(DB, D)$), $u_i \succeq u_j$, where
+$u_i$ is a member of group($child(DB, D)$) while $u_j$ is a member of
+group($DB$).
+Then $u_i \succeq u_j \succeq u_k$.
+
+\subsection{Change Notification}
+ \label{subsec:notification}
+As described in Section \ref{sec:cooperativedb}, changes of a
+design data may affect the validity of other design data in 
+cooperative design.
+So notification of the changes is very important.
+
+To consider methods for change notification, we find a problem to whom
+the changes are notified.
+Here we take an approach to notify the changes to the designer who 
+referred the changed data.
+The reason is that CAD systems cannot decide precisely whether to 
+correct the affected data or not, and the designer must make some decisions.
+
+In order to lighten designers' burden for searching the affected
+data, the change notification must include information which 
+data is affected.
+Then CAD system must manage information which data may be
+affected by the change of a design data.
+We propose a concept of {\em referred data} for a design data.
+\begin{definition} \label{def:referreddata}
+Define a set of {\em referred data} for a design data $D$ as:
+\begin{enumerate}
+\item{\label{rd:copyD}} All design data which are created by transactions 
+{\em create}, {\em copy}, {\em merge}, and {\em test} to $D$ are 
+referred data.
+\item{\label{rd:readD}} All design data which are designed using results 
+of transactions {\em read} and {\em readinfo} to $D$ are referred data.
+\item{\label{rd:copyrd}} All design data which are created by transactions 
+{\em create}, {\em copy}, {\em merge}, and {\em test} to a referred 
+data for $D$ are referred data.
+\item{\label{rd:readrd}} All design data which are designed using results 
+of transactions {\em read} and {\em readinfo} to a referred data for 
+$D$ are referred data.
+\end{enumerate}
+\hfill$\Box$ \end{definition}
+We notice that, in the cases \ref{rd:readD} and \ref{rd:readrd}, referred
+data cannot be decided automatically, because a designer may implement 
+some design objects simultaneously.
+
+A design data which is a referred data for $D$ may be affected by the
+change of $D$.
+Since design data which had referred the changed data may even be affected,
+we provide a method of notifying all referred data for
+$D$ when $D$ is changed. 
+
+%So we provide a \refhis for each design data, and holds a history 
+%about all transactions which have or had referred the data.
+%
+We provide an {\em affected event queue} for each design data.
+If a design data $D$ have changed, the system sends a message, which
+includes information which data has changed, to all the referred data 
+for $D$.
+The message appends to the affected event queue of $D$.
+It doesn't send to the owner of $D$ directly, because the changes may affect 
+to older versions, which has no need to update.
+
+When a designer $u$ accesses the affected data $AD$, all messages in its affected
+event queue would be managed, the results of the management would
+be sent to the owner of $AD$, and the owner would correct $AD$ 
+according to the received results.
+On the other hand, the system sends to $u$ a message to keep his transaction
+waiting.
+
+\subsection{Error Notification}
+ \label{subsec:errornot}
+In our data management model, in contrast with the conventional
+approach, a designer $u$ can test a design data if the access control
+function $F(u, test, db, f_1, \cdots, f_n) = 1$, even in the case he
+doesn't belong to a group which owns it.
+If he cannot update the design data in which he found some errors, CAD
+system must provide a method to notify these errors to designers who can
+update it.
+
+If $F(u, test, db, f_1, \cdots, f_n) = 1 \wedge F(u, create, db, f_1,
+\cdots, f_n) = 0 \wedge F(u, update, db, f_1, \cdots, f_n) = 0$, the 
+system sends a message to the owner of the tested data what kind of 
+tests were executed, and what the results were. 

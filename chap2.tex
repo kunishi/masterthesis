@@ -1,0 +1,206 @@
+\section{Database Systems for Cooperative Design}
+\label{sec:cooperativedb}
+In this section, we summarize how cooperative design
+process on CAD systems can be realized, and consider the requirements for 
+database systems to support cooperative design.
+We will also mention functions of conventional CAD database systems 
+for cooperative design and their problems.
+
+\subsection{Cooperative Design Processes}
+\label{subsec:coop-process}
+Cooperative design process consists of two phases, first top-down design
+and then bottom-up design.
+Let us consider a case to design a lare system.
+%Cooperative design process usually goes in a bottom-up manner, 
+%following in a top-down manner.
+%Here, for an example, we consider the case of designing a system.
+%Figure ?? shows a typical process of design of the system.
+
+At first, the system to be designed is recursively divided into
+some subsystems.
+In most cases, each subsystem is a functional block which can be 
+designed independently from each other.
+In cooperative design process, a group, which consists of some 
+designers, is organized to implement each subsystem.
+A group may divide the subsystem into more smaller blocks, each of which
+is designed by a subgroup of the group.
+After dividing the system in such a way, design of some blocks is
+assigned to a designer, and he implements those blocks.
+
+Since the subsystem which is assigned to a group uses the blocks
+assigned to its members, the group cannot complete design of the
+subsystem without the implementations of the blocks.
+For this reason, his blocks are shared among the members of the group  
+when he is convinced that he found and fixed all errors in the blocks.
+The shared blocks are merged into an implementation of the subsystem,
+and the members of the group continue design of the subsystem with
+testing it a number of times.
+
+When some errors are found in his implementation in the design process
+of the subsystem,
+it is prevented to access from the members of the group 
+except him, and he tests and modifies it until the errors are
+corrected.
+When the group finishes correcting errors in the subsystem, 
+it is shared among the members of a larger group, and design 
+process proceeds similarly until whole the implementation of the system to
+be designed would be completely implemented.
+
+A lot of design data are created during these design processes; 
+descriptions of the specifications of the subsystems, its
+implementations, input data for tests, results of the tests, etc.
+A designer
+may refer to these design data in various ways: 
+he may read other design data ---
+whose owner may be other designer --- or its auxiliary data,
+such as their names, the time of creation, the time of the latest
+update, their owners etc; he may copy or snapshot other design data; he may test
+the design data shared among other designers; he may create a new
+version of the design data. 
+
+In a design process, even the design data with errors may be accessed.
+For example, they may be referred to correct similar errors in another
+design data.
+All the design data must be remained until the process finished, in
+order to be able to refer them at any time during the process.
+Moreover, there must be some kinds of distinctions between the design
+data with no error and with some errors, in order to prevent from
+designers' misuse of a design data with some errors.
+
+We also notice that the referring data are in most cases under
+implementation.
+This means that design data which a designer is referring may be updated
+frequently.
+As a result, he may redesign his blocks with referring the new design data.
+
+\subsection{Requirements for Database Systems to Support Cooperative
+Design}
+\label{subsec:require}
+As described in Section \ref{sec:intro}, it has been very popular to
+design circuits or softwares on CAD systems with databases in order to
+manage a lot of design data efficiently.
+There are various requirements for CAD databases to support
+cooperative design on CAD systems.
+
+First, varieties of transactions are necessary for the cooperative design processes 
+on CAD systems, as follows:
+\begin{itemize}
+ \item reading design data%\ ({\em read})
+ \item updating design data if it is allowed%\ ({\em write})
+ \item reading the auxiliary data of designs%\ ({\em readinfo})
+ \item updating the auxiliary data of designs%\ ({\em writeinfo})
+ \item copying design data into a database%\ ({\em copy})
+ \item making a snapshot of  design data%\ ({\em snapshot})
+ \item making design data to be shared among the members who belongs a
+same group%\ ({\em up})
+ \item making shared design data not to be accessed from other designers
+of a group%\ ({\em down})
+ \item merging some design data to create a new design data%\ ({\em merge})
+ \item testing design data with test tools and some test data%\ ({\em test}).
+\end{itemize}
+CAD database systems must provide these transactions.
+
+Second, CAD database systems must have several 
+functions to support these transactions.
+\begin{enumerate}
+ \item{\label{req:manage}} a function to manage various design data
+
+Various design data are created on design processes on CAD systems, and
+CAD database systems must manage these data well.
+For example, CAD database systems must make some restrictions to the
+transactions to design data with some errors.
+
+ \item{\label{req:get}} a function to get all 
+the information necessary for his design processes, including other 
+designers' data and their auxiliary data.
+
+In cooperative design, a designer frequently wants to refer others'
+design data during his design process.
+CAD database systems must provide some methods to support these
+references.
+
+ \item{\label{req:prevent}} a function to prevent other designers to 
+access his design without his permission.
+
+In contrast to the function \ref{req:get}, a designer has a requirement
+of preventing other designers to read his design data, update them, or
+copy them, etc, without his permission.
+
+If it is allowed to read his design data including some errors, other
+designers may read them and may design systems with errors.
+If a designer's data under implementation would be updated without his
+permission, he could not know what changes would be made in his design
+or why those changes would be made.
+
+ \item{\label{req:errornotify}} a function to notify the errors in his 
+design data which other designers find.
+
+If some errors are found in a designer's data which he does not allow
+other designers to update, the errors must be notified to him to correct
+them.
+
+ \item{\label{req:changenotify}} a function to notify the changes of 
+design data to the designers who have referred them.
+
+A design data which was implemented with referring other data is
+more or less influenced by the contents of the referred data.
+If the contents of the referred data are changed, the changes must be 
+notified to all the designers who have implemented systems with 
+referring them.
+\end{enumerate}
+
+\subsection{Conventional Database Systems for Cooperative Design}
+Conventional CAD database systems for cooperative design are 
+constructed using a hierarchy of a public database, project databases, 
+and private databases, as shown in Figure \ref{fig:groupdb}
+\cite{Chou:vldb86,Klahold:sigmod85}.
+\label{subsec:conventionaldb}
+\begin{figure}
+\begin{center}
+\input{groupdb}
+\end{center}
+\caption{Conventional Database Model for Cooperative Design}
+\label{fig:groupdb}
+\end{figure}
+
+The design data in the public database are accessible by any designer.
+The design data in a private database are owned and accessed by only one
+user.
+A designer places design data in his group database when he wants to
+share data with other designers who belong to the same group.
+Other designers of the same group copy them, update them, etc, as new
+versions in the group database.
+
+Such a database system satisfies the requirements \ref{req:prevent} and
+\ref{req:changenotify} in Section \ref{subsec:require}.
+The design data which are placed in a designer's private database are
+accessible only to himself, and he permits other designers in a same group
+to update his design data by placing it in the group's database.
+In \cite{Chou:vldb86}, message-based and flag-based change
+notification mechanisms are also provided.
+
+However, there are several problems in this database structure.
+The first problem is that it does not always satisfy the requirement 
+\ref{req:get}.
+All the design data a designer can access are in the public database, his
+private database, and the database of the group in which he belongs.
+He cannot get any information from the design data on other databases.
+Since it is difficult to divide a design object so that each subsystem
+could be implemented independently, CAD database systems must support
+more flexible data management methods for cooperative design that
+conventional methods.
+
+The second problem is that it does not provide any methods for the
+requirement \ref{req:errornotify}.
+The conventional model assumes that shared data in a group database have
+no error and have no need for testing.
+This assumption is invalid in actual cooperative design processes,
+because there is an requirement to share design data with some errors,
+for the reason that its errors cannot be fixed unless it is tested by
+the group.
+
+The third problem is that methods for the requirement
+\ref{req:manage} are insufficient for actual cooperative design process.
+The conventional model provides no method but placing design data with
+some errors in a database, which can access only the members of a group.
+This method is insufficient for the same reason as that of the second problem.

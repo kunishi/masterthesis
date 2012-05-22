@@ -1,0 +1,55 @@
+\begin{abstract}
+In a design process utilizing a Computer-Aided Design (CAD) system, many 
+design data are created by 
+designers or the CAD system; the descriptions of the design objects,
+their auxiliary data (their creation date etc.), input data for tests, 
+and the results of the tests, etc.
+Since these data are often referred to at any time of the design 
+process, they must be retained until the design is completed.
+For this reason, database systems must be combined with CAD systems 
+in order to manage design data efficiently, and there are many 
+papers on CAD databases.
+
+CAD database systems must have new functions which are not 
+required for traditional database systems.
+One of these functions is to support cooperative design.
+So large and complicated design object that it could hardly
+be designed by one designer is usually implemented cooperatively by a
+number of designers.
+CAD database systems must offer some functions which make the
+cooperation of the designers to be easy, such as the methods of 
+sharing design data, the control methods for accessing design data, 
+change notification methods, etc.
+
+A conventional design database system gives a management method for 
+cooperative design based on a hierarchy of databases.
+However, this management method has less flexibility of controlling
+transactions.
+
+In this thesis, we propose a new data management model in the database
+hierarchy.
+First we define a concept of an {\em access control function}, which 
+determines whether to permit a transaction to operate on a design data.
+It is defined for each design data as a function from $U$ (a set of 
+users), $T$ (a set of transactions), $DB$ (a set of databases), and 
+an $n$-bit vector of {\em test flags}, each of 
+which is provided for each test tool on CAD systems and reflects the 
+result of the latest test of the test tools.
+We also show an extension of the function in order to distinguish two
+situations of testing: confirming its validity and specifying causes of
+errors.
+
+Next we propose a concept of ``\testtool {\em dependency}", a binary 
+dependency between two test tools whose test results always implys the others.
+We also mention the relationships between the access control function
+and this dependency.
+
+We also show an example of the access control function and the \testtool
+dependency under a user transaction model, which is similar to actual 
+CAD databases.
+
+Finally we consider several extensions of the access control functions
+and the \testtool dependencies.
+We also consider a concept of user hierarchy and change notification
+methods on our data management model.
+\end{abstract}

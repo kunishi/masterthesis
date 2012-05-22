@@ -1,0 +1,52 @@
+SHELL	= /bin/sh
+TEX	= main.tex \
+	chap1.tex \
+	chap2.tex \
+	chap3.tex \
+	chap4.tex \
+	chap5.tex \
+	ack.tex \
+	abst.tex \
+	jabst.tex \
+	refer.tex \
+	app.tex
+FIGDIR	= ../fig
+FIGTEX	= $(FIGDIR)/groupdb.tex \
+	$(FIGDIR)/tfs-lattice.tex \
+	$(FIGDIR)/dpa.tex
+DVI	= main.dvi 
+BACKUPDIR = flute:tex/masterthesis \
+	yasaka:tex/masterthesis
+DEVOPT	= latex
+
+.SUFFIXES: .fig .tex
+
+.fig.tex:
+	(cd $(FIGDIR); make DEVOPT=$(DEVOPT) $(@F))
+
+all: $(DVI)
+
+$(DVI):	$(TEX) $(FIGTEX)
+	latex $(DVI:.dvi=.tex)
+
+finish::
+	@echo Executing latex once more...
+	latex $(DVI:.dvi=.tex)
+
+backup:
+	-for i in $(BACKUPDIR) ; \
+	 do echo $$i; \
+	    rcp Makefile *.tex $$i; \
+	    (cd $(FIGDIR); rcp $(FIGTEX) $(FIGTEX:.tex=.fig) $$i); \
+	 done
+
+clean:
+	rm -f *.aux *.log *.dvi *.toc *.bbl *.blg core
+
+allclean: clean figtexclean
+
+figtexclean:
+	(cd $(FIGDIR); make clean)
+
+$(TEX):
+###

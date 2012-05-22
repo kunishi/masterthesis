@@ -1,0 +1,49 @@
+\begin{thebibliography}{99}
+
+\bibitem{Batory:acmtrans85}
+D.S.Batory and W.Kim: {\em Modeling Concepts for VLSI CAD Objects},
+ACM Trans. Database Syst., Vol.15, No.7 (Sep. 1985), 322--346.
+
+\bibitem{Bancilhon:vldb85}
+F. Bancilhon, W. Kim, and H. Korth: {\em A Model of CAD Transactions},
+Proc. Intl. Conf. on Very Large Data Bases (Aug. 1985), 25--33.
+
+\bibitem{Chou:vldb86}
+Hong-Tai Chou and W. Kim: {\em A Unifying Framework for Version Control
+in a CAD Environment}, 
+Proc. Intl. Conf. on Very Large Data Bases (Aug. 1986), 336--344.
+
+\bibitem{Katz:da86}
+R. H. Katz, M. Anwarrudin, and E. Chang:
+{\em A Version Server for Computer-Aided Design Data}.
+Proc. 23rd Design Aut. Conf. (Jun. 1986), 27--33.
+
+\bibitem{Ketabchi:ieeetransse88}
+M. A. Ketabchi and V. Berzins:
+{\em Mathematical Model of Composite Objects and Its Application for
+Organizeing Engineering Databases}.
+IEEE Trans. Software Eng., Vol.14, No.1 (Jan. 1988), 71--84.
+
+\bibitem{Klahold:sigmod85}
+P. Klahold, G. Schlageter, R. Unland, and W. Wilkes: {\em A Transaction
+Model Supporting Complex Applications in Integrated Information
+Systems}, 
+Proc. ACM SIGMOD Intl. Conf. on Management of Data (May 1986), 388--401.
+
+\bibitem{Ellis:sigmod89}
+C. A. Ellis and S. J. Gibbs:
+{\em Concurrency Control in Groupware Systems},
+Proc. ACM SIGMOD Intl. Conf. on Management of Data (May 1989), 399--407.
+
+\bibitem{Ishiura:Jousho90}
+N. Ishiura, M. Takahash, and S. Yajima:
+{\em Time-Symbolic Simulation for Accurate Timing Verification of Logic
+Curcuits}, 
+Trans. IPSJ, Vol.31, No.12 (Dec. 1990), 
+1832--1839, in Japanese.
+
+%\bibitem{Xu:91}
+%H. Xu: {\em Cooperation Transaction Model for Multiple Correctness
+%Levels}. to appear, 1991.
+%
+\end{thebibliography}

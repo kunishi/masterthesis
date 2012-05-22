@@ -1,0 +1,102 @@
+\section{Introduction}
+\label{sec:intro}
+In order to design large and complex hardware and software, use of CAD 
+(Computer-Aided Design) systems is essential.
+Due to the recent requirement to realize large systems, database
+function must be combined with CAD systems.
+%In the fields of circuit design or software design, in recent years,
+%design objects have been so larger and more complicated that they could
+%hardly be designed by hand.
+%Then it has been much popular to design circuits or
+%softwares on Computer-Aided Design (CAD) systems.
+
+In a design process utilizing a CAD system, many design data are created by
+designers or the CAD system; the descriptions of the design objects,
+their auxiliary data (their creation date etc.), input data for tests, 
+and the results of the tests, etc.
+Since these data are often referred to at any time of the design 
+process, they must be retained until the design is completed.
+For this reason, database systems are used in CAD systems in order to 
+manage design data efficiently, and there are many papers on CAD 
+databases
+\cite{Batory:acmtrans85,Bancilhon:vldb85,Chou:vldb86,Katz:da86,Ketabchi:ieeetransse88,Klahold:sigmod85}.
+
+CAD database systems must have new functions which are not 
+required for traditional database systems.
+One of these functions is to support cooperative design.
+Large and complicated design object, which could hardly
+be designed by one designer, are usually implemented cooperatively by a
+number of designers.
+CAD database systems must offer some functions which lighten the
+designers' burden for cooperative design, such as the methods of 
+sharing design data, the control methods for accessing design data, 
+change notification methods, etc.
+
+A conventional design database system gives a management method for cooperative
+design based on a hierarchy of databases
+\cite{Chou:vldb86,Klahold:sigmod85}.
+The system provides a public database for all the designers, a group
+database for each group on the design process, and a private database
+for each designer.
+Design data which are shared among the members of a project are placed 
+in the database of the project.
+Any of the members can execute any transactions to the shared data, and
+the other members cannot execute any transactions to them.
+If a design data is assumed to be error free, it is placed into the
+parent database in the hierarchy.
+On the other hand, if some errors are found in a design data, it is 
+placed back into a child database in the hierarchy.
+
+This management method has some merits to support cooperative design.
+First, it provides simple and powerful data sharing methods and 
+transaction control methods.
+Second, it is suitable for distributed design environment, which has
+been popular with the spread of low-priced and powerful
+workstations.
+
+However, this management method has less flexibility of controlling
+transactions.
+For example, it often happens that shared data in a group database
+can be read by any member of the group, but few of the members are
+allowed to update them.
+The conventional method cannot support such a transaction control, since 
+permission to access design data depends on only the 
+database the design data places, not on the kind of transactions.
+
+In this thesis, we propose a new data management model on the database
+hierarchy.
+First we define a concept of an {\em access control function}, which 
+determines whether to permit a transaction to operate on a design data.
+It is defined for each design data as a function from $U$ (a set of 
+users), $T$ (a set of transactions), $DB$ (a set of databases), and 
+an $n$-bit vector of {\em test flags}, each of 
+which is provided for a test tool on CAD systems and reflects the 
+result of the latest test using the tool.
+We also show an extension of the function in order to distinct two
+situations of testing: confirming its validity and specifying causes of
+errors.
+
+Next we propose a concept of ``\testtool {\em dependency}", a binary 
+dependency between two test tools whose test results always implys the others.
+We also mention the relationships between the access control function
+and this dependency.
+
+We also show an example of the access control function and the \testtool
+dependency under a user transaction model, which is similar to actual 
+user transactions on CAD databases.
+
+Finally we consider several extensions of the access control function
+and the \testtool dependency.
+We also consider concepts of user hierarchy, change notification
+methods, and error notification methods on our data management model.
+
+The remainder of this thesis is organized as follows.
+In Section \ref{sec:cooperativedb} we summarize the cooperative design
+process on CAD systems.
+We also mention the conventional CAD database systems for cooperative 
+design, and consider problems of such database systems in this section.
+We describe our data management model, the access control function and
+the \testtool dependency in Section \ref{sec:dmm}.
+In Section \ref{sec:extension}, extensions of our data management model are
+discussed.
+Section \ref{sec:conclu} is concluding remarks.

@@ -1,0 +1,57 @@
+\documentstyle[mydef,epsf]{kuthesis} 
+%\documentstyle[mydef]{article}
+%\input{a4}
+\input{fig2tex}
+%
+% Initial setup
+\setcounter{secnumdepth}{3}
+%\newtheorem{definition}{Definition}
+%\newtheorem{example}{Example}
+\hyphenation{da-ta-base Com-put-er-Aid-ed}
+\newcommand{\tfs}{$tfs$ }
+\newcommand{\testtool}{{\em testTool }}
+\newcommand{\testtooldep}{\longrightarrow_{tool} }
+\newcommand{\deterr}{{\em detectError }}
+\newcommand{\up}{{\em up }}
+\newcommand{\down}{{\em down }}
+\newcommand{\refhis}{{\em referred history}}
+\interwordspacestretch{6pt}
+\sloppy
+%
+% set title, author, etc.
+\title{A Data Management Model for Cooperative Design}
+\author{Takeo KUNISHIMA}
+\date{Feb. 15, 1991}
+% only for kuthesis 
+\jtitle{共同設計のためのデータ管理モデル}
+\jauthor{國島　丈生}
+\supervisor{Shuzo YAJIMA}
+
+%\includeonly{chap1,chap2,chap3,chap4,chap5}
+
+\begin{document}
+
+\maketitle
+\addtocontents{toc}{\protect\contentsline{section}{内容梗概/Abstract}{}}
+% jabst is only available in kuthesis
+\include{jabst}
+\include{abst}
+\tableofcontents
+\addtocontents{toc}{\protect\contentsline {section}{Contents}{}}
+
+% only for kuthesis
+\beginbody
+
+\include{chap1} 
+\include{chap2}
+\include{chap3}
+\include{chap4}
+\include{chap5}
+\pagestyle{empty}
+\addtocontents{toc}{\protect\contentsline {section}{Acknowledgements}{}}
+\include{ack}
+\addtocontents{toc}{\protect\contentsline {section}{References}{}}
+\include{refer}
+\addtocontents{toc}{\protect\contentsline {section}{Appendix}{}}
+\include{app}
+\end{document}

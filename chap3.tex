@@ -1,0 +1,441 @@
+\section{A Data Management Model for Cooperative Design}
+\label{sec:dmm}
+In this section, we describe several methods necessary for 
+cooperative design on CAD systems,
+summarized in Section \ref{subsec:coop-process}.
+In the following sections, we suppose that a CAD database is 
+constructed using a hierarchy
+of a public database, project databases, and private databases, as
+described in Section \ref{subsec:conventionaldb}.
+
+\subsection{Preliminaries}
+\label{subsec:prelim}
+In this section, we formally define several concepts in cooperative design
+processes.
+
+%\begin{definition} \label{def:data}
+%Define a design data $D$ as
+%\[ D = (name, version). \] \hfill$\Box$
+%\end{definition}
+
+First we give a formal notation of designers to define a concept
+``group".
+\begin{definition} \label{def:users}
+Define \[ U=\{u_{1}, u_{2}, \cdots, u_{m}\} \] as a set of designers, where
+$u_i (1 \leq i \leq m)$ is a designer. \hfill$\Box$
+\end{definition}
+
+In cooperative design, a number of designers relates to one project.
+Assumed that the members of each project are different from each other,
+we can define a concept of a project member, ``group",  as follows:
+\begin{definition} \label{def:groups}
+Define \[ G = \{g_1, g_2, \cdots, g_n\} \] as a set of project groups,
+where $g_i (1 \leq i \leq n)$ is a project group, which is a subset of
+$U$. \hfill$\Box$
+\end{definition}
+
+\begin{definition} \label{def:parent}
+If two groups $g$ and $g'$ satisfy the following conditions
+\[ g' \in G \mbox{ s.t. } g \subseteq g', 
+\mbox{ no group } g'' \mbox{ s.t. } g \subseteq g'' \subseteq g', \] 
+we call $g'$ as a parent of $g$.\\
+Define a child of group $g$ as
+\begin{center}
+$g'$ is a parent of $g$ $\iff$ $g$ is a child of $g'$.
+\end{center}\hfill$\Box$
+\end{definition}
+In general, a group $g$ has a number of parents and children.
+
+\begin{definition} \label{def:ancestor}
+If two groups $g$ and $g'$ satisfy the following conditions
+\[ g' \in G \mbox{ s.t. } g \subseteq g' ,\] 
+we say $g'$ as an ancestor of $g$.\\
+If a group $g'$ is an ancestor of a group $g$, we call $g$ as a
+descendant of $g'$.  \hfill$\Box$
+\end{definition}
+
+\subsection{Data Management Based on Test Results}
+\label{subsec:tfs-lattice}
+\subsubsection{Management of Test Results}
+\label{subsubsec:tfs-lattice}
+In the design processes on CAD systems, many tools are used for tests,
+%and the design data which passes tests of more test tools may be
+%considered to have more validity.
+and the rank of validity for a design data can be defined by a set of
+test tools whose tests are passed.
+In the case of cooperative design, a designer is likely to decide 
+whether to share a design data by what kinds of tests it has passed, 
+so the information about test results is much important for design on 
+CAD systems.
+
+A designer often refers results of the latest test to a design data in 
+order to decide whether to correct it. 
+If the latest test was failed, he must investigate the causes of the
+errors and correct them.
+
+However, results of the latest test is not enough to decide whether 
+to share design data. 
+He cannot make an exact judge from the results whether there are no more 
+errors in it.
+For example, when design data passed design rule checking, which is the
+latest test, he convinces it to have no error against design rules.
+However, its results are insufficient to decide whether to share it as
+an released data, since he cannot get any information about other kinds of
+errors. 
+Thus results of other tests are needed.
+
+For this reason, we provide flags, called {\em test flags}, for each 
+design data for the number of test tools.
+Each flag $f_i$ means that the latest test using a test tool $t_i$ is 
+passed or failed.
+In general, each design data has different test flags on each other,
+since test tools applicable to each design data may be different from
+each other.
+Design data which are the same but in different databases may have
+different test flags. 
+
+There are $n$ test flags on a design data, which form a {\em test-flag
+vector} $tfs = (f_1, f_2, \cdots, f_n)$, if CAD systems has $n$ test
+tools $t_1, t_2, \cdots, t_n$.
+A set of all the values of \tfs equals to $\{0,1\}^n$, and 
+organizes a lattice, called {\em tfs-lattice}, which is constructed as
+follows:
+\begin{quote}
+$glb(tfs_1, tfs_2) = tfs_1 \wedge tfs_2$\\
+$lub(tfs_1, tfs_2) = tfs_1 \vee tfs_2$\\
+where $\wedge$ and $\vee$ means bitwise-and and bitwise-or, respectively.
+\end{quote}
+An example of tfs-lattice is shown in Figure \ref{fig:tfs-lattice}. 
+\begin{figure}
+\begin{center}
+\input{tfs-lattice}
+\\Each node of the lattice is a test-flag vector which means that: 
+\[ (simulation1, simulation2, design rule check) \]
+\caption{Lattice of Test-Flags Vectors}
+\label{fig:tfs-lattice}
+\end{center}
+\end{figure}
+
+Using \tfs, more delicate data management can be done.
+For example, it can manage that only design data which passed tests with a 
+certain number of tools are made to be sharable; 
+or it also can do a management to make some kinds of tests to 
+a design data to be valid only for the case that it passed a certain 
+kinds of tests.
+
+In general, it is possible to manage transactions on design
+data using a function $F(u, t, db, f_1, f_2, \cdots, f_n)$,
+where $u$ is a designer, $t$ is a transaction, $db$ is a database in which
+the data places, and $f_i$ is a test flag. 
+$F$ equals to 1 iff (if and only if) the transaction is valid.
+In the previous examples, $F$ can be defined as a threshold function about
+the variables $f_1, f_2, \cdots, f_n$, and a
+function that depends on only one variable, respectively.
+Hereafter we call $F$ as an {\em access control function}.
+
+\subsubsection{Dependencies among Test Tools}
+\label{subsubsec:testtooldep}
+In this section, we describe a management method on tfs-lattice for 
+transactions.
+
+We observe one characteristic about test tools on CAD systems.
+There are some cases that they have dependencies on each other.
+Examples are as follows:
+
+\begin{example}\label{ex:rulecheck}
+Logic circuits which passed the tests of a logic simulator are
+expected to pass the tests of a design rule checker, since circuits
+which does not satisfy design rules cannot pass logic simulation.
+Then a designer might omit a design rule check to the circuits which
+passed logic simulation.\hfill$\Box$
+\end{example}
+
+\begin{example}\label{ex:timesymbol}
+It is reported in \cite{Ishiura:Jousho90} that in some logic circuits, 
+time-symbolic simulation gives more exact results than min/max delay 
+simulation.
+This also means that logic circuits which passed tests of the min/max delay
+simulation always pass tests of the time-symbolic simulation.\hfill$\Box$
+\end{example}
+
+We formalize such dependencies among test tools to provide a concept 
+``\testtool dependency".
+\begin{definition}\label{def:testtool-depend}
+If all the design data which passed tests using a tool $t_1$ are 
+expected to pass tests of another tool $t_2$,
+we would say ``there is a \testtool dependency from $t_1$ to $t_2$", and
+notate as:
+\[ t_1 \testtooldep t_2 .\]\hfill$\Box$
+\end{definition}
+
+\begin{example}
+In the previous examples \ref{ex:rulecheck} and \ref{ex:timesymbol}, 
+there are \testtool dependencies 
+\begin{quote}
+logic-simulator $\testtooldep$ design-rule-checker,\\
+min-max-delay-sim $\testtooldep$ time-symbolic-sim,
+\end{quote} respectively.\hfill$\Box$
+\end{example}
+
+If a test for a design data using test tool $t_i$ has passed, value of 
+a flag $f_i$ becomes 1, and, a value of \tfs changes  the bitwise-or 
+between \tfs and the vector of length $n$ that all but the $i$-th 
+flag is 0.
+However, when test tool $t_i$ has a \testtool dependency to another 
+test tool $t_j$,
+it can be considered that design data which passed the test 
+of $t_i$ would pass the test of $t_j$.
+In that case, test of $t_j$ can be omitted, and design data whose $f_i$
+is 1 but $f_j$ is 0 can be handled as if $f_i$ and $f_j$ are both 1.
+It is formalized by an access control function $F$ in Section 
+\ref{subsec:tfs-lattice} as follows.
+If \testtool dependency $t_i \testtooldep t_j$ exists, then
+\[ F\left|_{f_i=1,f_j=0} \right. \equiv F\left|_{f_i=1, f_j=1} \right. .\]
+
+Though a \testtool dependency $t_1 \testtooldep t_2$ exists, there are
+cases that tests of $t_2$ are required.
+One of the cases is that a designer uses $t_2$ and corrects as many
+errors as possible, to make tests of $t_1$ to be more simple.
+
+\subsection{Data Management after Testing}
+ \label{subsec:aftertest}
+There are two different purposes to test design data on CAD systems:
+\begin{enumerate}
+\item{\label{confirm}} to confirm that the design data has no error,
+\item{\label{specify}} to specify the causes of the errors.
+\end{enumerate}
+In the case \ref{confirm}, the design data's validity has 
+increased if the test is passed.
+On the other hand, there are some errors in the design data in the
+case \ref{specify}, and it has less validity than it had before
+the errors were found.
+We must distinct those two cases, since design data's validity is 
+an important factor for deciding whether to access transactions on it.
+
+We can distinct those two cases by results of the latest test.
+The case \ref{confirm} occurs only when design data passed the latest 
+test; on the other hand, the case \ref{specify} occurs only when the
+latest test was failed and causes of the errors have not been specified yet.
+
+Then we provide a flag called \deterr flag for each design data. 
+If a designer has tested his design data to find some errors in its
+results, the value of \deterr of the design data becomes
+1.
+And if he finished specifying causes of the errors, the value of 
+\deterr becomes 0.
+In other words, if this flag equals to 1, the owner of the data is now 
+specifying causes of the errors.
+
+Using this flag, CAD database can distinct the cases \ref{confirm} and
+\ref{specify}, and can manage the same transaction in a different way.
+For example, it can do a management to make the design data to be 
+accessible until the causes of some errors in it are specified.
+
+This management method is formalized as a function\\ $F'(u, t,
+db, f_1,
+f_2, \cdots, f_n, detectError)$, an extension of the access control
+function $F$ in Section
+\ref{subsec:tfs-lattice}.
+In the above example, $F'$ is defined as $F' = F \vee detectError$, 
+where $F$ is a function in Section \ref{subsec:tfs-lattice}.
+
+\subsection{A Management Model of Data Sharing}
+ \label{subsec:updown}
+On a database hierarchy as mentioned in Section
+\ref{subsec:conventionaldb}, each group has its own group database,
+in which design data are placed to be shared among the members of the 
+group, and other designers cannot write into the group database.
+
+Based on these facts, CAD database can support data sharing on a
+database hierarchy only to provide these two transactions: placing design
+data into a parent database, and placing design data into a child
+database.
+Then we provide two transactions in order to manage
+data sharing on the database hierarchy.
+\begin{enumerate}
+ \item \up transaction\\
+a transaction to place a design data into the parent database,
+ \item \down transaction\\
+a transaction to place a design data into the child database for the
+data.
+\end{enumerate}
+
+Here we use concepts a ``child database" of a database for a design
+data in accordance with the following definition.
+\begin{definition}\label{def:child-for-dd}
+Define a child database $child(db)$ of database $db$ for a design 
+data $d$ as a child database of $db$ which is an ancestor of the 
+designer of $d$. \hfill$\Box$
+\end{definition}
+
+\up and \down transactions have some properties:
+\begin{itemize}
+\item \up transaction on a design data is valid only when a group which 
+owned the data regards it to be designed completely.
+\item When a \down transaction is executed on a design data, the owner
+of the data is changed to the one who owned it before it was upped.
+\end{itemize}
+
+Using the management methods described in Sections
+\ref{subsec:tfs-lattice} and \ref{subsec:aftertest}, formalization of 
+management methods about \up and \down transactions 
+satisfying these properties is as follows.
+
+A management method of \up transaction is as follows.
+\up transaction of a designer $u$ will be accepted only if $F(u, up, db, f_1, f_2, 
+\cdots, f_n) = 1 \wedge detectError = 0$ and he has an authority to 
+write the parent database.
+
+\down transaction is managed as follows.
+\down transaction only runs when \deterr flag equals to 1.
+It is accepted only if a designer who executed the \down transaction
+has an authority to write the child database for the downed data.
+A value of \tfs is set to the one when it was upped.
+
+\subsection{An Example of the Data Management Model}
+ \label{subsec:example}
+In this section, we show an example of a data management model based on
+methods described in Sections \ref{subsec:tfs-lattice},
+\ref{subsec:aftertest}, and \ref{subsec:updown}.
+
+\subsubsection{A User Transaction Model for Cooperative Design}
+ \label{subsubsec:transmodel}
+In this example, we consider a user transaction model for cooperative
+design as follows:
+\begin{itemize}
+\item read($D$)\\
+read design data $D$.
+\item update($D$)\\
+update design data $D$, not creating a new version of $D$.
+\item create($D$, $V$, $DB$)\\
+create a new version $V$ of design data $D$ into database $DB$.
+\item readinfo($D$)\\
+read auxiliary data of design data $D$.
+\item writeinfo($D$)\\
+rewrite auxiliary data of design data $D$.
+\item copy($D$, $V$, $DB$)\\
+copy design data $D$ into database $DB$ as a version $V$.
+\item snapshot($D$, $DB$)\\
+make a snapshot of design data $D$ into database $DB$.
+\item up($D$)\\
+make design data $D$ to be shared among the members of the parent 
+group.
+\item down($D$)\\
+make design data $D$ to be shared among only the members of the
+child for data $D$
+\item merge($D_1$, $D_2$, $\cdots$, $D_n$, $D$)\\
+merge design data $D_1, D_2, \cdots, D_n$ as a design data $D$.
+\item test($TOOL$, $D$, $TDATA$)\\
+test design data $D$ with a test tool $TOOL$ using test data $TDATA$.
+\end{itemize}
+
+\subsubsection{A Data Management Model}
+ \label{subsubsec:construct}
+In this section, we show an example of a data management model for the
+user transaction model described in Section \ref{subsubsec:transmodel},
+using management methods in Sections \ref{subsec:tfs-lattice},
+\ref{subsec:aftertest}, and \ref{subsec:updown}.
+
+First, the following user transactions are modeled without the
+management methods described in above sections.
+\begin{itemize}
+\item readinfo($D$)\\
+This user transaction is always accepted for all designers.
+\item writeinfo($D$)\\
+This user transaction is accepted only if it is executed by the owner of
+$D$.
+\end{itemize}
+
+Second, several user transactions are divided into some 
+transactions as follows:
+\begin{itemize}
+\item copy($D$, $V$, $DB$)\\
+This user transaction is divided into some subtransactions:
+read($D$), create($D$, $V_0$, $DB$).
+It is accepted only when both of them are accepted.
+\item snapshot($D$, $DB$)\\
+This user transaction is also divided into some subtransactions:
+read($D$) and create($D$, $V_0$, $DB$).
+It is accepted only when both of them are accepted.
+\item up($D$)\\
+This user transaction is divided into some subtransactions:
+read($D$) and create($D$, $V_0$, $parent(DB)$), where $parent(DB)$ 
+is the parent database of the database in which $D$ is placed.
+It is accepted only when both of them are accepted and \deterr of $D$ 
+equals to 0.
+
+When it is finished, the owner of $D$ is changed to a group who owns
+$parent(DB)$.
+\item down($D$)\\
+This user transaction is divided into some subtransactions:
+read($D$) and create($D$, $V_0$, $child(DB, D)$), where $child(DB, 
+D)$ is the child database for the data $D$.
+It is accepted only when both of them are accepted.
+
+When it is finished, the owner of $D$ is changed to a group who owns
+$child(DB, D)$.
+\item merge($D_1$, $D_2$, $\cdots$, $D_n$, $D$)\\
+This user transaction is divided into some subtransactions:
+read($D_1$), read($D_2$), $\cdots$, read($D_n$), and create($D, V_0, DB$), 
+where $DB$ is a database in which $D_1, D_2, \cdots, D_n$ are placed.
+It is accepted only when all of them are accepted.
+\item test($TOOL$, $D$, $TDATA$)\\
+This user transaction is divided into some subtransactions:
+read($D$), read($TDATA$), and create($r, V_0, DB$), where
+$r$ is results of the test.
+It is accepted only when all of them are accepted.
+
+If the test would be passed, test flag of $D$ which corresponds to 
+$TOOL$ is changed to 1. If failed, the test flag is changed to 0, and 
+\deterr flag becomes 1. 
+\end{itemize}
+
+Next, we model the transactions read($D$), update($D$), and create($D$, $V$,
+$DB$) with a function $F'$ in \ref{subsec:aftertest}.
+Here we model them according to the following principles.
+\begin{itemize}
+\item read($D$) is acceptable for designers who don't belong to the
+group owned $DB$ as well as the members of the group.
+\item create($D$, $V$, $DB$) is only acceptable for the members of the 
+group owned $DB$.
+\item update($D$) is only acceptable for a few of the members of the
+group owned $DB$.
+\end{itemize}
+Reasons are:
+\begin{enumerate}
+\item{\label{reason:req}} There may be a requirement that a designer 
+implements his design with referring other groups' design data.
+\item In the case \ref{reason:req}, update of shared design data may affect
+a large number of design data.
+Then there must be more authorities to update shared design data. 
+\end{enumerate}
+
+We construct a function $F'$ as 
+\[ F' = F''(u, t, db, evalTest(f_1, f_2, \cdots, f_n), detectError). \]
+That is, $f_1, f_2, \cdots, f_n$ are made to be independent of other 
+variables.
+
+Details of $F''$ is
+\begin{itemize}
+\item $F''(u, read(D), DB, evalTest, 0) = 1$ for all designer $u$\\
+$F''(u, read(D), DB, evalTest, 1) = 1$ iff $u$ is a member of group($DB$)
+\item $F''(u, create(D, V, DB), DB, evalTest, detectError) = 1$ iff $u$ is a 
+member of $group(DB)$
+\item $F''(u, update(D), DB, evalTest, 0) = 1$ iff $u$ is a member of
+group($DB$)\\
+$F''(u, update(D), DB, evalTest, 1) = 1$ iff $u$ is a member of
+group($child(DB, D)$) 
+\end{itemize}
+
+At last, a function $evalTest$ would be modeled.
+Suppose the CAD system has test tools $t_1, t_2, t_3$, $evalTest$ is a
+Boolean function of $f_1, f_2, f_3$.
+For example, in the case that design data must pass tests
+of at least two tools to be shared.
+%(An example of this situation is Example \ref{ex:rulecheck} in Section
+%\ref{subsubsec:testtooldep}.)
+$evalTest$ is formed as a threshold function
+\[ evalTest(f_1, f_2, f_3) = f_1f_2 + f_2f_3 + f_3f_1 .\]
+If there is a \testtool dependency $t_1 \testtooldep t_2$, then
+$evalTest$ is 
+\[ evalTest(f_1, f_2, f_3) = f_1 + f_2f_3 + f_3f_1 .\]
