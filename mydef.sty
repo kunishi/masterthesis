@@ -1,0 +1,32 @@
+% redefinition of "theorem" environment.
+% It makes the alphabets used in the theorem environment bold.
+\def\@begintheorem#1#2{\trivlist \item[\hskip \labelsep{\bf #1\ #2}]}
+\def\@opargbegintheorem#1#2#3{\trivlist
+      \item[\hskip \labelsep{\bf #1\ #2\ (#3)}]}
+\def\@endtheorem{\hfill$\Box$\endtrivlist}
+
+% thanks for YASUOKA Kouichi.
+\def\interwordspacestretch#1{\fontdimen2\frtnrm=#1
+\fontdimen2\frtnmi=#1
+\fontdimen2\frtnsy=#1}
+
+% redefinition of "caption".
+% caption format is made to be "number. caption".
+\long\def\@makecaption#1#2{
+ \vskip 10pt
+ \setbox\@tempboxa\hbox{#1 #2}
+ \ifdim \wd\@tempboxa >\hsize #1. #2\par \else \hbox
+to\hsize{\hfil\box\@tempboxa\hfil}
+ \fi}
+
+%
+% several \theorem environments
+%
+\newtheorem{definition}{定義}
+\newtheorem{e-definition}{Definition}
+\newtheorem{example}{例}
+\newtheorem{e-example}{Example}
+\newtheorem{algorithm}{アルゴリズム}
+\newtheorem{e-algorithm}{Algorithm}
+
+\hyphenation{da-ta-base}
